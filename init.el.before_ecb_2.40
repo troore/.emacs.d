@@ -1,0 +1,176 @@
+;;-----------------Basic Settings----------------;;
+
+(add-to-list 'load-path "~/.emacs.d/lisp/")
+;(let ((default-directory "~/.emacs.d/lisp/"))
+;  (normal-top-level-add-subdirs-to-load-path))
+
+;;remove tool bar or menu bar in graphic emacs{
+(tool-bar-mode -1)
+;(menu-bar-mode -1)
+
+;;display line number
+(global-linum-mode t)
+
+;;set where the scroll bars should be {
+(set-scroll-bar-mode 'right) ; replace "'right" with "'left" to place it to the left
+;;}
+
+;remove Emacs welcome window on start
+(setq inhibit-startup-message t)
+
+;;modify default emacs font{
+;(set-default-font "-unknown-DejaVu Sans Mono-normal-normal-normal-*-19-*-*-*-m-0-iso10646-1")
+(set-default-font "DejaVu Sans Mono-14")
+;;}
+
+;;不生成#F#文件
+(setq auto-save-default nil)
+;;不生成临时文件
+(setq-default make-backup-files nil)
+
+
+;;indentation {
+(defun set-newline-and-indent()
+ (local-set-key (kbd "RET") 'newline-and-indent))
+;;不用 TAB 字符来indent, 这会引起很多奇怪的错误。
+;;编辑 Makefile 的时候也不用担心，因为 makefile-mode 会把 TAB 键设置成真正的 TAB 字符，并且加亮显示的
+;(setq-default indent-tabs-mode t)
+(setq-default indent-tabs-mode nil)
+(setq default-tab-width 4)
+(setq tab-stop-list ())
+;;}
+
+
+;;---------------------Advanced Settings-----------------;;
+
+;;color theme{
+(add-to-list 'load-path "~/.emacs.d/lisp/color-theme/")
+(require 'color-theme)
+(color-theme-initialize)
+(color-theme-xp)
+;;}
+
+;; c/c++ {
+(add-hook 'c-mode-hook 'set-newline-and-indent)
+(add-hook 'c++-mode-hook '(lambda ()
+						 (local-set-key (kbd "RET") 'newline-and-indent)
+						 (c-set-style "stroustrup")))
+(setq c-basic-offset 4)
+;;
+
+;;html
+(add-hook 'html-mode-hook 'set-newline-and-indent)
+;;}
+
+
+;;verilog {
+(add-hook 'verilog-mode-hook '(lambda () (font-lock-mode 1)))
+(add-hook 'verilog-mode-hook '(lambda ()
+    (add-hook 'local-write-file-hooks (lambda()
+       (untabify (point-min) (point-max))))))
+;;}
+
+
+;; Markdown {
+(autoload 'markdown-mode "markdown-mode"
+   "Major mode for editing Markdown files" t)
+(add-to-list 'auto-mode-alist '("\\.text\\'" . markdown-mode))
+(add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
+(add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
+
+(add-hook 'markdown-mode-hook
+        (lambda ()
+          (when buffer-file-name
+            (add-hook 'after-save-hook
+                      'check-parens
+                      nil t))))
+; warning, may yield wrong results in edge-cases like single double-quotes in code block.
+; Use only if your files usually are balanced w/r/t double-quotes
+; <http://stackoverflow.com/questions/9527593/customizing-check-parens-to-check-double-quotes>
+(add-hook 'markdown-mode-hook (lambda () (modify-syntax-entry ?\" "\"" markdown-mode-syntax-table)))
+;;}
+
+;; matlab mode {
+; Only use matlab.el for editing code, do not try other tools currently.
+(add-to-list 'load-path "/home/troore/.emacs.d/lisp/matlab-emacs/matlab-emacs")
+(autoload 'matlab-mode "matlab" "Matlab Editing Mode" t)
+(add-to-list
+ 'auto-mode-alist
+ '("\\.m$" . matlab-mode))
+(setq matlab-indent-function t)
+(setq matlab-shell-command "matlab")
+;;}
+
+;; Aspell {
+;; M-x flyspell-mode
+ (setq-default ispell-program-name "aspell") 
+;; }
+
+;; cedet {
+;(add-to-list 'load-path "~/.emacs.d/lisp/cedet")
+;(load-file "/home/troore/.emacs.d/lisp/cedet/cedet-devel-load.el")
+;(semantic-mode 1)
+;(require 'semantic/ia)
+;(require 'semantic/bovine/gcc)
+
+;; Load CEDET.
+;; See cedet/common/cedet.info for configuration details.
+;; IMPORTANT: Tou must place this *before* any CEDET component (including
+;; EIEIO) gets activated by another package (Gnus, auth-source, ...).
+(load-file "~/.emacs.d/lisp/cedet/cedet-devel-load.el")
+
+;; Add further minor-modes to be enabled by semantic-mode.
+;; See doc-string of `semantic-default-submodes' for other things
+;; you can use here.
+(add-to-list 'semantic-default-submodes 'global-semantic-idle-summary-mode t)
+(add-to-list 'semantic-default-submodes 'global-semantic-idle-completions-mode t)
+(add-to-list 'semantic-default-submodes 'global-cedet-m3-minor-mode t)
+
+;; Enable Semantic
+(semantic-mode 1)
+
+;; Enable EDE (Project Management) features
+(global-ede-mode 1)
+
+;;;}
+
+;; ibus {
+(add-to-list 'load-path "~/.emacs.d/lisp/ibus-el-0.3.2")
+(require 'ibus)
+(add-hook 'after-init-hook 'ibus-mode-on)
+(global-set-key (kbd "C-=") 'ibus-toggle) ;;这里既是绑定设置的C+=快捷键到ibus中
+;;}
+
+;; python {
+(add-to-list 'load-path "~/.emacs.d/lisp/python-mode-6.1.3")
+(require 'python-mode)
+(autoload 'python-mode "python-mode" "Python Mode." t)
+(add-to-list 'auto-mode-alist '("\\.py\\'" . python-mode))
+(add-to-list 'interpreter-mode-alist '("python" . python-mode))
+;;}
+
+;; cscope {
+(add-to-list 'load-path "~/.emacs.d/lisp/xcscope")
+(require 'xcscope)
+(cscope-setup)
+; invoke xcscope for c/c++ files only
+(add-hook 'c-mode-common-hook
+	  '(lambda ()
+	    (require 'xcscope)))
+;;}
+
+;; make {
+;; }
+
+;; ecb {
+(require 'semantic/analyze)
+(provide 'semantic-analyze)
+(provide 'semantic-ctxt)
+(provide 'semanticdb)
+(provide 'semanticdb-find)
+(provide 'semanticdb-mode)
+(provide 'semantic-load)
+(add-to-list 'load-path "~/.emacs.d/lisp/ecb-2.40")
+(require 'ecb)
+;(require 'ecb-autoloads)
+;;}
