@@ -39,8 +39,8 @@
 
 
 ;;indentation {
-(defun set-newline-and-indent()
- (local-set-key (kbd "RET") 'newline-and-indent))
+;(defun set-newline-and-indent()
+;  (local-set-key (kbd "RET") 'newline-and-indent))
 ;;}
 
 ;; 统一设置tab默认长度
@@ -105,18 +105,29 @@
 
 ;; cedet {
 ;;
-(load-file "~/.emacs.d/lisp/cedet/cedet-devel-load.el")
+(load-file "~/.emacs.d/lisp/cedet-bzr/cedet-devel-load.el")
+;(load-file "~/.emacs.d/lisp/cedet/contrib/cedet-contrib-load.el")
 
-;; semantic
-;; Add further minor-modes to be enabled by semantic-mode.
-;; See doc-string of `semantic-default-submodes' for other things
-;; you can use here.
-;(add-to-list 'semantic-default-submodes 'global-semantic-idle-summary-mode t)
-;(add-to-list 'semantic-default-submodes 'global-semantic-idle-completions-mode t)
-(add-to-list 'semantic-default-submodes 'global-cedet-m3-minor-mode t)
+;(add-to-list 'semantic-default-submodes 'global-semantic-show-parser-state-mode)
+;(add-to-list 'semantic-default-submodes 'global-semantic-mru-bookmark-mode)
+;(add-to-list 'semantic-default-submodes 'global-semantic-highlight-func-mode)
+;(add-to-list 'semantic-default-submodes 'global-semantic-stickyfunc-mode)
+;(add-to-list 'semantic-default-submodes 'global-semantic-decoration-mode)
+;(add-to-list 'semantic-default-submodes 'global-semantic-idle-local-symbol-highlight-mode)
+(add-to-list 'semantic-default-submodes 'global-semantic-idle-summary-mode)
+;(add-to-list 'semantic-default-submodes 'global-cedet-m3-minor-mode)
 
 ;; Enable Semantic
 (semantic-mode 1)
+
+(require 'semantic/ia)
+
+(require 'semantic/bovine/gcc)
+
+;(defun my-c-mode-cedet-hook ()  
+;  (local-set-key "." 'semantic-complete-self-insert)  
+;  (local-set-key ">" 'semantic-complete-self-insert))  
+;(add-hook 'c-mode-common-hook 'my-c-mode-cedet-hook)  
 
 ;; Remove 'system from the throttle to speed up parsing
 (setq-mode-local c-mode
@@ -126,16 +137,19 @@
 ; 配置semantic的检索范围
 (setq semanticdb-project-roots
 	  (list
-		(expand-file-name "./")))
+		(expand-file-name "/")))
+
+(defconst cedet-user-include-dirs   
+		  (list "."))  
+
+;;设置semantic cache临时文件的路径，避免到处都是临时文件，同时避免每次关闭emacs都提示保存database位置
+(setq semanticdb-default-save-directory "~/.emacs.d/semanticdb")
 
 ; 为智能补全类或结构体成员绑定快捷键
-;(global-set-key "C-c C-v" (quote semantic-ia-complete-menu))
-
-;(setq semanticdb-project-roots
-;	  (list "~/Projects/gpu-engineering/GPGPU-Sim/gpgpu-sim/v3.x/src"))
+(global-set-key (quote [C-tab]) (quote semantic-ia-complete-symbol-menu))
 
 ;; Enable EDE (Project Management) features
-;(global-ede-mode 1)
+;(global-ede-mode t)
 
 ;;;} End-of-cedet
 
@@ -174,21 +188,22 @@
 (provide 'semantic-load)
 (add-to-list 'load-path "~/.emacs.d/lisp/ecb-2.40")
 (require 'ecb)
-;(require 'ecb-autoloads)
+(require 'ecb-autoloads)
 
 (custom-set-variables
   ;; custom-set-variables was added by Custom.
   ;; If you edit it by hand, you could mess it up, so be careful.
   ;; Your init file should contain only one such instance.
   ;; If there is more than one, they won't work right.
- '(ecb-options-version "2.40")
- '(ede-project-directories (quote ("/home/troore/Projects/gpu-engineering/GPGPU-Sim/gpgpu-sim/v3.x/src"))))
+  '(ecb-options-version "2.40")
+  ;  '(ede-project-directories (quote ("/home/troore/Projects/gpu-engineering/GPGPU-Sim/gpgpu-sim/v3.x/src")))
+  )
 (custom-set-faces
   ;; custom-set-faces was added by Custom.
   ;; If you edit it by hand, you could mess it up, so be careful.
   ;; Your init file should contain only one such instance.
   ;; If there is more than one, they won't work right.
- )
+  )
 ;;}
 
 ;; makefile {
@@ -199,10 +214,30 @@
 ;;}
 
 ;; cc-mode {
-(add-hook 'c-mode-hook 'set-newline-and-indent)
+;(add-hook 'c-mode-hook 'set-newline-and-indent)
+(add-hook 'c-mode-hook '(lambda ()
+						 (local-set-key (kbd "RET") 'newline-and-indent)
+						 (c-set-style "stroustrup")
+						 ))
 (add-hook 'c++-mode-hook '(lambda ()
 						 (local-set-key (kbd "RET") 'newline-and-indent)
-						 (c-set-style "stroustrup")))
-(setq c-basic-offset 4)
-(c-set-offset 'substatement-open 0)
+						 (c-set-style "stroustrup")
+						 ))
+; default c-basic-offset may be 2 or 5
+;(setq c-basic-offset 4)
+;(c-set-offset 'substatement-open 0)
 ;; } End-of-cc-mode
+
+;; opencl-mode {
+(setq auto-mode-alist (cons '("\\.ocl$" . c-mode) auto-mode-alist))
+;(add-to-list 'load-path "/home/troore/.emacs.d/lisp/opencl-mode-emacs")
+;(require 'opencl-mode)
+;(setq auto-mode-alist (cons '("\\.ocl$" . opencl-mode) auto-mode-alist))
+;; }
+
+;; icicles {
+(add-to-list 'load-path "~/.emacs.d/lisp/icicles/")
+(require 'icicles)
+(icy-mode 1)
+;; }
+
