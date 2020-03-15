@@ -1,5 +1,12 @@
 ;;-----------------Basic Settings----------------;;
 
+
+;; Added by Package.el.  This must come before configurations of
+;; installed packages.  Don't delete this line.  If you don't want it,
+;; just comment it out by adding a semicolon to the start of the line.
+;; You may delete these explanatory comments.
+(package-initialize)
+
 (add-to-list 'load-path "~/.emacs.d/lisp/")
 
 ;; mode line configuration{
@@ -32,10 +39,8 @@
 ;;disable temporary files
 (setq-default make-backup-files nil)
 
-
-
 ;; tab width
-(setq default-tab-width 4)
+(setq default-tab-width 2)
 
 ;; Aspell {
 ;; M-x flyspell-mode
@@ -56,19 +61,18 @@
 (add-hook 'c-mode-common-hook 'google-set-c-style)
 (add-hook 'c-mode-common-hook 'google-make-newline-indent)
 
+;;-----------------MELPA----------------;;
+;(browse-url-emacs "http://melpa.org/packages/archive-contents" t)
+(require 'package)
+;(add-to-list 'package-archives
+;             '("melpa-stable" . "http://stable.melpa.org/packages/") t)
+(add-to-list 'package-archives
+             '("melpa" . "http://melpa.org/packages/") t)
 
-;; cc-mode {
-;(add-hook 'c-mode-hook 'set-newline-and-indent)
-(add-hook 'c-mode-hook '(lambda ()
-			  (local-set-key (kbd "RET") 'newline-and-indent)
-			  (c-set-style "stroustrup")
-			  ))
-(add-hook 'c++-mode-hook '(lambda ()
-			    (local-set-key (kbd "RET") 'newline-and-indent)
-			    (c-set-style "stroustrup")
-			    ))
-; default c-basic-offset may be 2 or 5
-;(setq c-basic-offset 4)
-;(c-set-offset 'substatement-open 0)
-;; } End-of-cc-mode
+;(require 'ycmd)
+;(add-hook 'c++-mode-hook 'ycmd-mode)
+;(set-variable 'ycmd-server-command '("/home/xuechao/tools/anaconda3/bin/python" "/home/xuechao/download/ycmd/ycmd"))
+
+;; Specify a global emacs configuration
+;(set-variable 'ycmd-global-config "/home/xuechao/download/ycmd/.ycm_extra_conf.py")
 
