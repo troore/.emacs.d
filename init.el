@@ -9,12 +9,44 @@
 
 (add-to-list 'load-path "~/.emacs.d/lisp/")
 
+;; (set-default-font "Monospace 18")
+(set-default-font "Courier 18")
+
+;; Set default window (emacs frame) size
+(if (display-graphic-p)
+    (progn
+      (setq initial-frame-alist
+            '(
+              (tool-bar-lines . 0)
+              (width . 82) ; chars
+              (height . 60) ; lines
+              (background-color . "honeydew")
+              (left . 50)
+              (top . 50)))
+      (setq default-frame-alist
+            '(
+              (tool-bar-lines . 0)
+              (width . 82)
+              (height . 60)
+              (background-color . "honeydew")
+              (left . 50)
+              (top . 50))))
+  (progn
+    (setq initial-frame-alist '( (tool-bar-lines . 0)))
+    (setq default-frame-alist '( (tool-bar-lines . 0)))))
+
 ;; mode line configuration{
 ;Enable the display of the current time
 (display-time-mode t)
 ;Enable or disable the display of the current line number
 (line-number-mode t)
-(setq linum-format "%2d ")
+;(setq linum-format (quote "%1d "))
+;;Right-aligned
+(defadvice linum-update-window (around linum-dynamic activate)
+  (let* ((w (length (number-to-string
+                     (count-lines (point-min) (point-max)))))
+         (linum-format (concat "%" (number-to-string w) "d ")))
+    ad-do-it))
 ;Enable or disable the display of the current column number
 (column-number-mode t)
 ;;}
@@ -27,7 +59,7 @@
 (global-linum-mode t)
 
 ;;set where the scroll bars should be {
-(set-scroll-bar-mode 'right) ; replace "'right" with "'left" to place it to the left
+;(set-scroll-bar-mode 'right) ; replace "'right" with "'left" to place it to the left
 ;;}
 
 ;remove Emacs welcome window on start
@@ -72,7 +104,4 @@
 ;(require 'ycmd)
 ;(add-hook 'c++-mode-hook 'ycmd-mode)
 ;(set-variable 'ycmd-server-command '("/home/xuechao/tools/anaconda3/bin/python" "/home/xuechao/download/ycmd/ycmd"))
-
-;; Specify a global emacs configuration
-;(set-variable 'ycmd-global-config "/home/xuechao/download/ycmd/.ycm_extra_conf.py")
 
