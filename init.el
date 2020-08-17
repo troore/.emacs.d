@@ -93,6 +93,9 @@
 (add-hook 'c-mode-common-hook 'google-set-c-style)
 (add-hook 'c-mode-common-hook 'google-make-newline-indent)
 
+;; cuda
+(add-to-list 'auto-mode-alist '("\\.cu\\'" . c++-mode))
+
 ;;-----------------MELPA----------------;;
 ;(browse-url-emacs "http://melpa.org/packages/archive-contents" t)
 (require 'package)
